@@ -31,10 +31,10 @@ pip install --upgrade numpy pandas scikit-learn nltk elasticsearch==7.17.6
 
 - The data must be downloaded separately due to its overall size.
 
-[short_abstracts_en.ttl](http://downloads.dbpedia.org/2016-10/core/short_abstracts_en.ttl.bz2)
-[intance_types_en.ttl](http://downloads.dbpedia.org/2016-10/core/instance_types_en.ttl.bz2)
-[smart_dataset_questions](https://github.com/smart-task/smart-dataset/tree/master/datasets/DBpedia)
-[bdpedia_types.tsv](https://github.com/smart-task/smart-dataset/tree/master/evaluation/dbpedia)
+[short_abstracts_en.ttl](http://downloads.dbpedia.org/2016-10/core/short_abstracts_en.ttl.bz2)</br>
+[intance_types_en.ttl](http://downloads.dbpedia.org/2016-10/core/instance_types_en.ttl.bz2)</br>
+[smart_dataset_questions](https://github.com/smart-task/smart-dataset/tree/master/datasets/DBpedia)</br>
+[dbpedia_types.tsv](https://github.com/smart-task/smart-dataset/tree/master/evaluation/dbpedia)</br>
 
 ### Project structure
 
@@ -44,10 +44,14 @@ The project is organized as follows:
 📦dat640_smarttask_group17
  ┣ 📂datasets
  ┃ ┣ 📂DBpedia
- ┃ ┃ ┣ 📜smarttask_dbpedia_test.json ##
- ┃ ┗ ┗ 📜smarttask_dbpedia_train.json ##
+ ┃ ┃ ┣ 📜smarttask_dbpedia_test.json  *
+ ┃ ┗ ┗ 📜smarttask_dbpedia_train.json *
  ┣ 📂evaluation
- ┃ ┗ 📜dbpedia_types.tsv
+ ┃ ┣ 📂dbpedia
+ ┃ ┗ ┗📜dbpedia_types.tsv *
+ ┣ 📂mappings
+ ┃ ┣ 📜instance_types_en.ttl  *
+ ┃ ┗ 📜short_abstracts_en.ttl *
  ┣ 📂results
  ┃ ┣ 📜advanced_es_system_output.json
  ┃ ┣ 📜bm25_es_system_output.json
@@ -61,9 +65,8 @@ The project is organized as follows:
  ┣ 📜evaluate.py
  ┣ 📜indexer.ipynb
  ┣ 📜main.py
- ┣ 📜SVM.py
- ┣ 📜LICENSE
- ┗ 📜README.md
+ ┣ 📜README.md
+ ┗ 📜SVM.py
 
 ```
 
