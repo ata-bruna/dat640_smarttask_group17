@@ -9,7 +9,7 @@ This repository contains the files for the project entitled "SeMantic AnsweR Typ
 * [Requirements](#requiements)
 * [Data](#data)
 * [How to navigate the repository](#how-to-navigate-the-repository)
-* [Room for Improvement](#room-for-improvement)
+* [Results](#results)
 
 
 
@@ -44,8 +44,6 @@ The project is organized as follows:
 📦dat640_smarttask_group17
  ┣ 📂datasets
  ┃ ┣ 📂DBpedia
- ┃ ┃ ┣ 📜instance_types_en.ttl ##
- ┃ ┃ ┣ 📜long_abstracts_en.ttl ##
  ┃ ┃ ┣ 📜smarttask_dbpedia_test.json ##
  ┃ ┗ ┗ 📜smarttask_dbpedia_train.json ##
  ┣ 📂evaluation
@@ -68,3 +66,25 @@ The project is organized as follows:
  ┗ 📜README.md
 
 ```
+
+## How to navigate the repository
+
+Before running the models it is necessary to create the Elasticsearch index. Run the `indexer.ipynb` notebook to do so. 
+Run the file `main.py` to perform category and type prediction. Alternatively, the files `advanced_model.py` and `b25_model.py` can be run separately.
+The description of the remaining files is provided below.
+
+-  `data_cleaning.py` contains helper functions used to perform text preprocessing or to convert the data into a specific format used by the models.
+-  `SVM.py` contains the pipeline used to perform category prediction.
+-  `baseline_category_prediction.py` contains all algorithms tested to perform category prediction
+-  `evaluate.py` contains the evaluation metrics implementation. This function was implemented by [Krisztian Balog](https://github.com/smart-task/smart-dataset/blob/master/evaluation/dbpedia/evaluate.py)
+
+## Results
+
+The achieved accuracy scores has been summarized in the table below:
+
+|     Method      | Accuracy | NDCG@5 | NDCG@10 |
+|:---------------:|:--------:|:------:|:-------:|
+|    BM25         |   0.93   |   --   |    --   |
+| LTR(pointwise)  |   0.93   |   --   |    --   |
+
+
