@@ -7,7 +7,7 @@ from elasticsearch import Elasticsearch
 from data_cleaning import load_data, load_queries, save_test_results
 
 
-INDEX_NAME = 'questions'
+INDEX_NAME = 'dbpedia'
 
 
 def baseline_retrieval(es, query:str, field = 'abstract', index = INDEX_NAME):
