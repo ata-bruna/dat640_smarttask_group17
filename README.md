@@ -29,8 +29,42 @@ pip install --upgrade numpy pandas scikit-learn nltk elasticsearch==7.17.6
 
 ## Data 
 
--The data must be downloaded separately due to its overall size.
+- The data must be downloaded separately due to its overall size.
 
-[short_abstracts_en.ttl]([http://downloads.dbpedia.org/2016-10/core/short_abstracts_en.ttl.bz2)
+[short_abstracts_en.ttl](http://downloads.dbpedia.org/2016-10/core/short_abstracts_en.ttl.bz2)
 [intance_types_en.ttl](http://downloads.dbpedia.org/2016-10/core/instance_types_en.ttl.bz2)
 [smart_dataset_questions](https://github.com/smart-task/smart-dataset/tree/master/datasets/DBpedia)
+[bdpedia_types.tsv](https://github.com/smart-task/smart-dataset/tree/master/evaluation/dbpedia)
+
+### Project structure
+
+The project is organized as follows:
+
+``` sh
+📦dat640_smarttask_group17
+ ┣ 📂datasets
+ ┃ ┣ 📂DBpedia
+ ┃ ┃ ┣ 📜instance_types_en.ttl ##
+ ┃ ┃ ┣ 📜long_abstracts_en.ttl ##
+ ┃ ┃ ┣ 📜smarttask_dbpedia_test.json ##
+ ┃ ┗ ┗ 📜smarttask_dbpedia_train.json ##
+ ┣ 📂evaluation
+ ┃ ┗ 📜dbpedia_types.tsv
+ ┣ 📂results
+ ┃ ┣ 📜advanced_es_system_output.json
+ ┃ ┣ 📜bm25_es_system_output.json
+ ┃ ┣ 📜test_queries_svm_output.json
+ ┃ ┗ 📜test_type_predictions.csv
+ ┣ 📜.gitignore
+ ┣ 📜advanced_model.py
+ ┣ 📜baseline_category_prediction.py
+ ┣ 📜bm25_model.py
+ ┣ 📜data_cleaning.py 
+ ┣ 📜evaluate.py
+ ┣ 📜indexer.ipynb
+ ┣ 📜main.py
+ ┣ 📜SVM.py
+ ┣ 📜LICENSE
+ ┗ 📜README.md
+
+```
