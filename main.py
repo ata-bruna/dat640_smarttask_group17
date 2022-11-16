@@ -12,6 +12,7 @@ from elasticsearch import Elasticsearch
 from bm25_model import es_BM25
 from advanced_model import create_query_terms, ltr_feature_vectors, ltr_predict
 
+INDEX_NAME = 'dbpedia'
 
 #%%
 if __name__ == "__main__":
@@ -52,7 +53,6 @@ if __name__ == "__main__":
     test_queries = dc.load_queries(test)
 
     es = Elasticsearch()
-    INDEX_NAME = 'dbpedia'
 
     test_res = es_BM25(es, test_queries, index=INDEX_NAME)
     dc.save_test_results(test_res, test, title='bm25_es')
