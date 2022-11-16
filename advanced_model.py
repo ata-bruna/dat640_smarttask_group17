@@ -12,7 +12,7 @@ from data_cleaning import load_data, load_queries, save_test_results
 
 
 # elastic search index
-INDEX_NAME = 'dbpedia_2'
+INDEX_NAME = 'dbpedia'
 
 def analyze_query(
     es: Elasticsearch, query: str, field: str, index: str = INDEX_NAME
