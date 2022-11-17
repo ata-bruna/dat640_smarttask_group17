@@ -19,7 +19,7 @@ This project uses target ontology from DBpedia 2016 dump.
 
 ## Requirements
 
-- This project requires Python >= 3.7, Elasticsearch == 7.17.6. You must have a running local Elasticsearch instance on your machine.
+This project requires Python >= 3.7, Elasticsearch == 7.17.6. You must have a running local Elasticsearch instance on your machine.
 
 ```
 pip install --upgrade numpy pandas scikit-learn nltk elasticsearch==7.17.6
@@ -27,12 +27,12 @@ pip install --upgrade numpy pandas scikit-learn nltk elasticsearch==7.17.6
 
 ## Data 
 
-- The data must be downloaded separately due to its overall size.
+The data must be downloaded separately due to its overall size.
 
-[short_abstracts_en.ttl](http://downloads.dbpedia.org/2016-10/core/short_abstracts_en.ttl.bz2)</br>
-[intance_types_en.ttl](http://downloads.dbpedia.org/2016-10/core/instance_types_en.ttl.bz2)</br>
-[smart_dataset_questions](https://github.com/smart-task/smart-dataset/tree/master/datasets/DBpedia)</br>
-[dbpedia_types.tsv](https://github.com/smart-task/smart-dataset/tree/master/evaluation/dbpedia)</br>
+- [short_abstracts_en.ttl](http://downloads.dbpedia.org/2016-10/core/short_abstracts_en.ttl.bz2)</br>
+- [intance_types_en.ttl](http://downloads.dbpedia.org/2016-10/core/instance_types_en.ttl.bz2)</br>
+- [smart_dataset_questions](https://github.com/smart-task/smart-dataset/tree/master/datasets/DBpedia)</br>
+- [dbpedia_types.tsv](https://github.com/smart-task/smart-dataset/tree/master/evaluation/dbpedia)</br>
 
 ### Project structure
 
