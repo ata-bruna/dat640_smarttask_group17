@@ -2,10 +2,10 @@
     This script is used to run all the models necessary 
     to achieve the results presented on the report
 """
-#%%
+
 import data_cleaning as dc
 import SVM as SVM
-from evaluate import *
+import evaluate as eval
 from baseline_category_prediction import run_baseline
 import json
 from elasticsearch import Elasticsearch
@@ -14,7 +14,6 @@ from advanced_model import create_query_terms, ltr_feature_vectors, ltr_predict
 from sklearn.linear_model import SGDRegressor
 
 INDEX_NAME = 'dbpedia'
-
 
 if __name__ == "__main__":
     df_train, df_test = dc.create_dataset()
@@ -53,21 +52,25 @@ if __name__ == "__main__":
     training_queries = dc.load_queries(train)
     test_queries = dc.load_queries(test)
 
+    print('\n \n')
+    print('Initiating Elasticsearch...')
+    print('-'*80)
     es = Elasticsearch()
+    print(es.info())
+    print('\n \n')
 
     print('Starting training BM25...')
+    title = 'bm25_es'
     test_res = es_BM25(es, test_queries, index=INDEX_NAME)
-    dc.save_test_results(test_res, test, title='bm25_es')
-    
+    dc.save_test_results(test_res, test, title=title)
+    print(f'Test results saved in "results/{title}_system_output.json"')
+    eval.eval_res(f"results/{title}_system_output.json")
+
+    print('Loading training queries for LTR...')
     training_queries = create_query_terms(training_queries, es)
     test_queries = create_query_terms(test_queries, es)
+    print('\n \n')
     
-    type_hierarchy, max_depth = load_type_hierarchy('evaluation/dbpedia/dbpedia_types.tsv')
-    ground_truth = load_ground_truth('datasets/DBpedia/smarttask_dbpedia_test.json', type_hierarchy)
-    system_output = load_system_output('results/advanced_es_system_output.json')
-    evaluate(system_output, ground_truth, type_hierarchy, max_depth)
-
-
     print('Starting training LTR...')
     X, y = ltr_feature_vectors(es, training_queries, k=100, index=INDEX_NAME)
     model = SGDRegressor(max_iter=1000, tol=1e-3, 
@@ -75,7 +78,6 @@ if __name__ == "__main__":
                         loss="huber",random_state = 42, early_stopping=True)
     model.fit(X, y)
 
-    
     print('Predicting category types...')
     title = 'advanced_es'
     test_advanced = ltr_predict(es, test_queries, model, k=100, index=INDEX_NAME)
@@ -83,7 +85,4 @@ if __name__ == "__main__":
     print(f'Test results saved in "results/{title}_system_output.json"')
 
     # Evaluation 
-    type_hierarchy, max_depth = load_type_hierarchy('evaluation/dbpedia/dbpedia_types.tsv')
-    ground_truth = load_ground_truth('datasets/DBpedia/smarttask_dbpedia_test.json', type_hierarchy)
-    system_output = load_system_output('results/advanced_es_system_output.json')
-    evaluate(system_output, ground_truth, type_hierarchy, max_depth)
+    eval.eval_res(f"results/{title}_system_output.json")

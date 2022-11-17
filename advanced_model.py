@@ -1,4 +1,3 @@
-#%%
 import json
 from typing import Callable, Dict, List, Set, Tuple
 import numpy as np
@@ -14,7 +13,7 @@ from evaluate import load_ground_truth, load_type_hierarchy, load_system_output,
 
 
 # elastic search index
-INDEX_NAME = 'dbpedia'
+INDEX_NAME = 'dbpedia_toy'
 
 def analyze_query(
     es: Elasticsearch, query: str, field: str, index: str = INDEX_NAME
@@ -351,16 +350,15 @@ if __name__ == "__main__":
     test_queries = create_query_terms(test_queries, es)
 
     print('Starting training LTR...')
-    X, y = ltr_feature_vectors(es, training_queries, k=100, index=INDEX_NAME)
+    X, y = ltr_feature_vectors(es, training_queries, k=30, index=INDEX_NAME)
     model = SGDRegressor(max_iter=1000, tol=1e-3, 
                         penalty = "elasticnet",
                         loss="huber",random_state = 42, early_stopping=True)
     model.fit(X, y)
 
-    #%%
     print('Predicting category types...')
     title = 'advanced_es'
-    test_advanced = ltr_predict(es, test_queries, model, k=100, index=INDEX_NAME)
+    test_advanced = ltr_predict(es, test_queries, model, k=30, index=INDEX_NAME)
     save_test_results(test_advanced, test, title=title)
     print(f'Test results saved in "results/{title}_system_output.json"')
 
@@ -369,3 +367,4 @@ if __name__ == "__main__":
     ground_truth = load_ground_truth('datasets/DBpedia/smarttask_dbpedia_test.json', type_hierarchy)
     system_output = load_system_output('results/advanced_es_system_output.json')
     evaluate(system_output, ground_truth, type_hierarchy, max_depth)
+

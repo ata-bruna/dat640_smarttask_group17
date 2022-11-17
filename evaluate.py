@@ -296,12 +296,11 @@ def arg_parser():
     return args
 
 
-def main(args):
+def eval_res(output_path):
     type_hierarchy, max_depth = load_type_hierarchy('evaluation\dbpedia\dbpedia_types.tsv')
     ground_truth = load_ground_truth('datasets\DBpedia\smarttask_dbpedia_test.json', type_hierarchy)
-    system_output = load_system_output('evaluation\dbpedia\system_output.json')
+    system_output = load_system_output(output_path)
     evaluate(system_output, ground_truth, type_hierarchy, max_depth)
 
 
-if __name__ == "__main__":
-    main(arg_parser())
+
