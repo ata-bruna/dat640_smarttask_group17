@@ -5,6 +5,7 @@ from collections import Counter
 from collections import defaultdict
 from elasticsearch import Elasticsearch
 from data_cleaning import load_data, load_queries, save_test_results
+from evaluate import load_ground_truth, load_type_hierarchy, load_system_output, evaluate
 
 
 INDEX_NAME = 'dbpedia'
@@ -64,11 +65,17 @@ def es_BM25(es, data, index=INDEX_NAME):
 
 
 # %%
-es = Elasticsearch()
-test = load_data('results/test_queries_svm_output.json')
-test_queries = load_queries(test)
-test_res = es_BM25(es, test_queries, index=INDEX_NAME)
-save_test_results(test_res, test, title='bm25_es')
+if __name__ == "__main__":
+    es = Elasticsearch()
+    test = load_data('results/test_queries_svm_output.json')
+    test_queries = load_queries(test)
+    test_res = es_BM25(es, test_queries, index=INDEX_NAME)
+    save_test_results(test_res, test, title='bm25_es')
+
+    type_hierarchy, max_depth = load_type_hierarchy('evaluation/dbpedia/dbpedia_types.tsv')
+    ground_truth = load_ground_truth('datasets/DBpedia/smarttask_dbpedia_test.json', type_hierarchy)
+    system_output = load_system_output('results/bm25_es1_system_output.json')
+    evaluate(system_output, ground_truth, type_hierarchy, max_depth)
 
 
 #%%

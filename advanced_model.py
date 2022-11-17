@@ -1,3 +1,4 @@
+#%%
 import json
 from typing import Callable, Dict, List, Set, Tuple
 import numpy as np
@@ -9,6 +10,7 @@ import re
 from collections import Counter
 from evaluate import load_type_hierarchy, get_type_path
 from data_cleaning import load_data, load_queries, save_test_results
+from evaluate import load_ground_truth, load_type_hierarchy, load_system_output, evaluate
 
 
 # elastic search index
@@ -92,24 +94,40 @@ def extract_features(query_terms: List,
         Returns:
             List of extracted feature values in a fixed order.
     """
-
-    total_docs = es.count(index=INDEX_NAME)['count']
-    term_doc_freq_dict = {}
+    
+    total_docs = es.count(index=INDEX_NAME)['count'] 
     query = dict(Counter(query_terms))    
+
     doc_term_freqs = {} 
     tv = es.termvectors(index=index, id=doc_id, fields='abstract', term_statistics=False)    
     for term, term_stat in tv['term_vectors']['abstract']['terms'].items():
         doc_term_freqs[term] = term_stat['term_freq']
     
     idf = []
+    term_doc_freq_dict = {}
     for term in query_terms:
         if not term in term_doc_freq_dict:
             n = 0
             hits = es.search(
                 index=index, 
-                query = {"bool": {"must": {"match": {"abstract": term}}, "must_not": {"match": {"instance": "owl:Thing"}}}}, 
+                query = {
+                    "bool": {
+                        "must": {
+                            "match": {
+                                "abstract": term
+                                }
+                            }, 
+                            "must_not": {
+                                "match": {
+                                    "instance": "owl:Thing"
+                                    }
+                                }
+                            }
+                        }, 
                 _source=False, size=1).get('hits',{}).get('hits',{})
+            
             doc_id = (hits[0]['_id'] if (len(hits) > 0) else None)
+
             if doc_id is not None:
                 tv = es.termvectors(index=index, id=doc_id, fields='abstract', term_statistics=True)['term_vectors']['abstract']['terms']
                 if term in tv:
@@ -137,7 +155,7 @@ def extract_features(query_terms: List,
 
 def ltr_feature_vectors(es: Elasticsearch, 
                         training_queries: Dict, 
-                        k=200, index=INDEX_NAME):
+                        k=100, index=INDEX_NAME):
     """
     LTR model, generates the feature vectors X and the 
     relevance labels y.
@@ -165,6 +183,7 @@ def ltr_feature_vectors(es: Elasticsearch,
     instances = []
     type_hierarchy, _ = load_type_hierarchy("evaluation\dbpedia\dbpedia_types.tsv")
 
+    
     for query_id, query_features in training_queries.items():
         type_relevancy = {}        
         for typ in query_features['type']:
@@ -184,9 +203,19 @@ def ltr_feature_vectors(es: Elasticsearch,
         if len(query) == 0:
             continue
         hits = es.search(index=index, _source=True, size=k, 
-           query = {"bool": {"must": {"match": {"abstract": ' '.join(query)}}, 
-           "must_not": {"match": {"instance": "owl:Thing"}}}}
-        )['hits']['hits']
+           query = {"bool": {
+            "must": {
+                "match": {
+                    "abstract": ' '.join(query)
+                    }
+                }, 
+            "must_not": {
+                "match": {
+                    "instance": "owl:Thing"
+                    }
+                }
+            }
+        })['hits']['hits']
 
         for hit in hits:
             X.append(extract_features(query, hit['_id'], es, index))
@@ -201,12 +230,18 @@ def ltr_feature_vectors(es: Elasticsearch,
             instances.append(instance_type)
 
         progress += 1
-        print(
-            "Processing query {}/{} ID {}".format(
-                progress, len(training_queries), query_id
+        if progress % 500 == 0:
+            print(
+                "Processing query {}/{} ID {}".format(
+                    progress, len(training_queries), query_id
+                )
             )
-        )
-        if progress==N:
+        if progress == N:
+            print(
+                "{}/{} queries processed ID {}".format(
+                    progress, len(test_queries), query_id
+                )
+            )
             break
 
     return X, y #, instances
@@ -235,8 +270,18 @@ def ltr_predict(es: Elasticsearch,
     for query_id, query_features in test_queries.items():
         query = query_features['query_terms']
         hits = es.search(index=index, _source=True, size=k, 
-            query = {"bool": {"must": {"match": {"abstract": ' '.join(query)}}, "must_not": {"match": {"instance": "owl:Thing"}}}}
-        )['hits']['hits']
+            query = {"bool": {
+                "must": {
+                    "match": {
+                        "abstract": ' '.join(query)
+                        }
+                    }, 
+                "must_not": {
+                    "match": {
+                        "instance": "owl:Thing"}
+                        }
+                    }
+                })['hits']['hits']
         feat_vecs, instances = [], []
         for hit in hits:
             feat_vecs.append(extract_features(query, hit['_id'], es, index))
@@ -248,16 +293,24 @@ def ltr_predict(es: Elasticsearch,
         results[query_id] = [x[0] for x in Counter(instances_rerank).most_common(10)]
 
         progress += 1
-        print(
-            "Processing query {}/{} ID {}".format(
-                progress, len(test_queries), query_id
+        if progress % 500 == 0:
+            print(
+                "Processing query {}/{} ID {}".format(
+                    progress, len(test_queries), query_id
+                )
             )
-        )
+        if progress == N:
+            print(
+                "{}/{} queries processed ID {}".format(
+                    progress, len(test_queries), query_id
+                )
+            )
+            break
 
     return results
 
 
-def save_test_results(test_res, test):
+def save_test_results(test_res, test, title):
     """Saves test results in a json file with the appropriate 
     format for evaluation.
     
@@ -281,26 +334,38 @@ def save_test_results(test_res, test):
         except:
             continue
 
-    f = open(f"results/advanced_es_system_output.json", "w")
+    f = open(f"results/{title}_system_output.json", "w")
     json.dump(list(all_test_queries.values()), f)
     f.close()
 
 
+if __name__ == "__main__":
+    train = load_data('datasets/DBpedia/smarttask_dbpedia_train.json')
+    test = load_data('results/test_queries_svm_output.json')
+    training_queries = load_queries(train)
+    test_queries = load_queries(test)
 
-train = load_data('datasets/DBpedia/smarttask_dbpedia_train.json')
-test = load_data('results/test_queries_svm_output.json')
-training_queries = load_queries(train)
-test_queries = load_queries(test)
+    es = Elasticsearch()
 
-es = Elasticsearch()
+    training_queries = create_query_terms(training_queries, es)
+    test_queries = create_query_terms(test_queries, es)
 
-training_queries = create_query_terms(training_queries, es)
-test_queries = create_query_terms(test_queries, es)
+    print('Starting training LTR...')
+    X, y = ltr_feature_vectors(es, training_queries, k=100, index=INDEX_NAME)
+    model = SGDRegressor(max_iter=1000, tol=1e-3, 
+                        penalty = "elasticnet",
+                        loss="huber",random_state = 42, early_stopping=True)
+    model.fit(X, y)
 
-from sklearn.linear_model import SGDRegressor
-model = SGDRegressor()
-X, y = ltr_feature_vectors(es, training_queries, k=100, index=INDEX_NAME)
-model.fit(X, y)
+    #%%
+    print('Predicting category types...')
+    title = 'advanced_es'
+    test_advanced = ltr_predict(es, test_queries, model, k=100, index=INDEX_NAME)
+    save_test_results(test_advanced, test, title=title)
+    print(f'Test results saved in "results/{title}_system_output.json"')
 
-test_advanced = ltr_predict(es, model, k=100, index=INDEX_NAME)
-save_test_results(test_advanced, test, title='advanced_es')
+    # Evaluation 
+    type_hierarchy, max_depth = load_type_hierarchy('evaluation/dbpedia/dbpedia_types.tsv')
+    ground_truth = load_ground_truth('datasets/DBpedia/smarttask_dbpedia_test.json', type_hierarchy)
+    system_output = load_system_output('results/advanced_es_system_output.json')
+    evaluate(system_output, ground_truth, type_hierarchy, max_depth)
