@@ -71,8 +71,7 @@ The project is organized as follows:
 ## How to navigate the repository
 
 Before running the models it is necessary to create the Elasticsearch index. Run the `indexer.ipynb` notebook to do so. 
-Run the file `main.py` to perform category and type prediction. Alternatively, the files `advanced_model.py` and `b25_model.py` can be run separately.
-The description of the remaining files is provided below.
+Run the file `main.py` to perform category and type prediction. Alternatively, the files `advanced_model.py` and `b25_model.py` can be run separately for type prediction. The description of the remaining files is provided below.
 
 -  `data_cleaning.py` contains helper functions used to perform text preprocessing or to convert the data into a specific format used by the models.
 -  `SVM.py` contains the pipeline used to perform category prediction.
