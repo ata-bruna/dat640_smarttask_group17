@@ -9,8 +9,6 @@ This repository contains the files for the project entitled "SeMantic AnsweR Typ
 * [Requirements](#requiements)
 * [Data](#data)
 * [How to navigate the repository](#how-to-navigate-the-repository)
-* [Results](#results)
-
 
 
 ## General Information
@@ -79,15 +77,5 @@ The description of the remaining files is provided below.
 -  `data_cleaning.py` contains helper functions used to perform text preprocessing or to convert the data into a specific format used by the models.
 -  `SVM.py` contains the pipeline used to perform category prediction.
 -  `baseline_category_prediction.py` contains all algorithms tested to perform category prediction
--  `evaluate.py` contains the evaluation metrics implementation. This function was implemented by [Krisztian Balog](https://github.com/smart-task/smart-dataset/blob/master/evaluation/dbpedia/evaluate.py)
-
-## Results
-
-The achieved accuracy scores has been summarized in the table below:
-
-|     Method      | Accuracy | NDCG@5 | NDCG@10 |
-|:---------------:|:--------:|:------:|:-------:|
-|    BM25         |   0.93   |   --   |    --   |
-| LTR(pointwise)  |   0.93   |   --   |    --   |
-
+-  `evaluate.py` contains the evaluation metrics implementation. This function was implemented by [Krisztian Balog](https://github.com/smart-task/smart-dataset/blob/master/evaluation/dbpedia/evaluate.py). The original script was kept, and the `eval_res` function was added at the end to perform the evaluation of results.
 
